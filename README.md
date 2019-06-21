@@ -13,8 +13,9 @@ repo = 'higashi000/sarahck.vim'
 ```
 
 ## How to use
-Slackのトークンを取得し，そのトークンを以下のようにvimrc等に記述
-※このトークンを他人に知られてしまうと乗っ取られてしまうのでgit等の管理下におかずに，別の場所に置くことを推奨します
+Slackのトークンを取得し，そのトークンを以下のようにvimscriptファイルに記述後 
+`source $FILEPATH/SlackAPI.vim`等でvimrcに記述して読み込ませてください<br>
+※このトークンを他人に知られてしまうと乗っ取られてしまうので他人に教えないでください
 
 ```
 let g:slackToken = "Your Token"
