@@ -34,9 +34,9 @@ endfunction
 
 function! sarahck#DispChannelHistory(channelName)
 let l:channelID = CheckTrueChannel(a:channelName)
+e ~/.SlackChannel.txt
 
 if l:channelID != "0"
-  e ~/.SlackChannel.txt
   let outputfile = "$HOME/.SlackChannel.txt"
   execute ":redir!>".outputfile
     silent! call GetChannelHistory(l:channelID)
@@ -45,43 +45,43 @@ if l:channelID != "0"
   execute ":normal G"
 elseif l:channelID == "0"
   echo "Wrong Channel Name"
-end
+endif
 endfunction
 
 function! GetChannelHistory(channelID)
 
-ruby << RUBY
-require 'http'
-require 'time'
-require 'json'
+python3 << PYTHON3
+import requests
+import vim
+import json
+import time
+from datetime import datetime
 
-channelHistory = HTTP.post("https://slack.com/api/channels.history", params: {
-  token: VIM.evaluate('g:slackToken'),
-  channel: VIM.evaluate('a:channelID'),
-  })
+sendData = {
+    "token" : vim.eval('g:slackToken'),
+    "channel" : vim.eval('a:channelID'),
+}
 
-channelMessages = JSON.parse(channelHistory)
+channelHistory = requests.get("https://slack.com/api/channels.history", params = sendData).json()
 
-sleep 1
+time.sleep(1)
 
-users = HTTP.post("https://slack.com/api/users.list", params: {
-  token: VIM.evaluate('g:slackToken'),
-  })
 
-userData = JSON.parse(users)
+sendData = {
+    "token" : vim.eval('g:slackToken'),
+}
+users = requests.get("https://slack.com/api/users.list", params = sendData).json()
 
-channelMessages["messages"].reverse_each do |channelData|
-  userData["members"].each do |i|
-    if i["id"] == channelData["user"] then
-      print i["profile"]["display_name"] + " " + (Time.at(channelData["ts"].to_i)).to_s
-    end
-  end
-  print channelData["text"]
-  print "\n"
-  print "-------------------------------------"
-  print "\n"
-end
-RUBY
+for channelData in reversed(channelHistory["messages"]) :
+    for i in users["members"] :
+        if i["id"] == channelData["user"] :
+            print(i["profile"]["display_name"] + " " + str((datetime.fromtimestamp(float(channelData["ts"])))))
+    print(channelData["text"])
+    print("")
+    print("-------------------------------------")
+    print("")
+PYTHON3
+
 endfunction
 
 " チャンネルリスト取得
