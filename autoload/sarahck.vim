@@ -3,31 +3,32 @@ set cpo&vim
 
 " メッセージ送信
 function! sarahck#SendMessage(...)
-  let l:argumentList = a:000
+let l:argumentList = a:000
 
-  let l:channelID = CheckTrueChannel(l:argumentList[0])
-  let l:postResult = ""
+let l:channelID = CheckTrueChannel(l:argumentList[0])
+let l:postResult = ""
 
-  if l:channelID != "0"
-ruby << RUBY
-  require 'http'
-  require 'json'
+if l:channelID != "0"
+python3 << PYTOHN3
+import vim
+import requests
+import json
 
-  response = HTTP.post("https://slack.com/api/chat.postMessage", params: {
-    token: VIM.evaluate('g:slackToken'),
-    channel: VIM.evaluate('l:channelID'),
-    text: VIM.evaluate('l:argumentList[1]'),
-    })
+sendData = {
+    "token" : vim.eval("g:slackToken"),
+    "channel" : vim.eval("l:channelID"),
+    "text" : vim.eval("l:argumentList[1]"),
+}
 
-  res = JSON.parse(response)
-  if res["ok"] == true then
+slackRes = requests.get("https://slack.com/api/chat.postMessage", params = sendData).json()
+
+if slackRes["ok"] == True:
     print("Complete")
-  else
+else :
     print("Failure")
-  end
-RUBY
+PYTOHN3
 elseif l:channelID == "0"
-echo "Wrong Channel Name"
+    echo "Wrong Channel Name"
 endif
 endfunction
 
@@ -87,26 +88,24 @@ endfunction
 function! CheckTrueChannel(channelName)
   let l:channelID = 0
 
-ruby << RUBY
-  require 'http'
-  require 'json'
+python3 << PYTHON3
+import vim
+import requests
+import json
 
-  response = HTTP.post("https://slack.com/api/channels.list", params: {
-    token: VIM.evaluate('g:slackToken'),
-    })
+sendData = {
+    "token" : vim.eval('g:slackToken')
+}
 
-  res = JSON.parse(response)
+slackRes = requests.get('https://slack.com/api/channels.list', params = sendData).json()
 
-  if res["ok"] == true then
-    res["channels"].each do |i|
-      if i["name"] == VIM.evaluate('a:channelName') then
-        VIM.command(%Q[let l:channelID = "#{i["id"]}"])
-      end
-    end
-  else
+if slackRes["ok"] == True :
+    for i in slackRes["channels"] :
+        if i["name"] == vim.eval('a:channelName'):
+            vim.command(":let l:channelID = '"+i["id"]+"'")
+else :
     print("failed to get channel list")
-  end
-RUBY
+PYTHON3
 
 return l:channelID
 endfunction
