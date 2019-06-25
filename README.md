@@ -3,11 +3,18 @@
 ## Description
 このプラグインはVimでSlackをすることを目標に作成されたものです
 
+## 動作確認済み環境
+Ubuntu18.04
+
 ## Install
 以下のコマンドを実行してpython3が有効化されているかを確認してください．<br>
 されていない場合は有効化を行ってください．
 ```
 :echo has('python3')
+```
+また，内部にpythonのrequestsモジュールを仕様しているので以下のコマンドでインストールしてください
+```
+pip3 install requests
 ```
 
 ### dein
