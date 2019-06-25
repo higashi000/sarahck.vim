@@ -35,12 +35,15 @@ endfunction
 function! sarahck#DispChannelHistory(channelName)
 let l:channelID = CheckTrueChannel(a:channelName)
 
+let l:fileName = "$HOME/." . a:channelName . ".txt"
+echo l:fileName
+
 if l:channelID != "0"
-  let outputfile = "$HOME/.SlackChannel.txt"
+  let outputfile = l:fileName
   execute ":redir!>".outputfile
     silent! call GetChannelHistory(l:channelID)
   redir END
-  e ~/.SlackChannel.txt
+  execute ":e" . l:fileName
   execute ":normal G"
 elseif l:channelID == "0"
   echo "Wrong Channel Name"
