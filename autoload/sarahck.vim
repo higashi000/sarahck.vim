@@ -34,14 +34,13 @@ endfunction
 
 function! sarahck#DispChannelHistory(channelName)
 let l:channelID = CheckTrueChannel(a:channelName)
-e ~/.SlackChannel.txt
 
 if l:channelID != "0"
   let outputfile = "$HOME/.SlackChannel.txt"
   execute ":redir!>".outputfile
     silent! call GetChannelHistory(l:channelID)
   redir END
-  checktime
+  e ~/.SlackChannel.txt
   execute ":normal G"
 elseif l:channelID == "0"
   echo "Wrong Channel Name"
@@ -75,7 +74,10 @@ users = requests.get("https://slack.com/api/users.list", params = sendData).json
 for channelData in reversed(channelHistory["messages"]) :
     for i in users["members"] :
         if i["id"] == channelData["user"] :
-            print(i["profile"]["display_name"] + " " + str((datetime.fromtimestamp(float(channelData["ts"])))))
+            if i["profile"]["display_name"] != "" :
+                print(i["profile"]["display_name"] + " " + str((datetime.fromtimestamp(float(channelData["ts"])))))
+            else :
+                print(i["profile"]["real_name"] + " " + str((datetime.fromtimestamp(float(channelData["ts"])))))
     print(channelData["text"])
     print("")
     print("-------------------------------------")
