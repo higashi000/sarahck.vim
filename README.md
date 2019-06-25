@@ -12,7 +12,7 @@ Ubuntu18.04
 ```
 :echo has('python3')
 ```
-また，内部にpythonのrequestsモジュールを仕様しているので以下のコマンドでインストールしてください
+また，内部でpythonのrequestsモジュールを使用しているので以下のコマンドでインストールしてください
 ```
 pip3 install requests
 ```
