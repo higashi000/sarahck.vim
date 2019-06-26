@@ -89,6 +89,43 @@ PYTHON3
 
 endfunction
 
+function! sarahck#DispChannelList()
+  let l:channelList = GetChannelList()
+  if has('patch-8.1.1594')
+    let pos = getpos('.')
+    let channelWindow = popup_create(l:channelList, {
+            \ 'pos': 'topleft',
+            \ 'line': line('.') + 2,
+            \ 'col': col('.') + 2,
+            \ 'moved': 'any',
+            \ })
+  else
+    echo "未実装〜"
+  endif
+endfunction
+
+function! GetChannelList()
+let l:channelList = []
+python3 << PYTHON3
+import vim
+import requests
+import json
+
+sendData = {
+    "token" : vim.eval('g:slackToken')
+}
+
+slackRes = requests.get('https://slack.com/api/channels.list', params = sendData).json()
+if slackRes["ok"] == True :
+    for i in slackRes["channels"] :
+        vim.command(":call add(l:channelList, '"+i["name"]+"')")
+else :
+    print("failed to get channel list")
+PYTHON3
+
+return l:channelList
+endfunction
+
 " チャンネルリスト取得
 function! CheckTrueChannel(channelName)
   let l:channelID = 0
