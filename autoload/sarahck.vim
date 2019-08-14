@@ -93,11 +93,18 @@ function! sarahck#DispChannelList()
   let l:channelList = GetChannelList()
   if has('patch-8.1.1594')
     let pos = getpos('.')
-    let channelWindow = popup_create(l:channelList, {
-            \ 'pos': 'topleft',
-            \ 'line': line('.') + 2,
-            \ 'col': col('.') + 2,
-            \ 'moved': 'any',
+    " let channelWindow = popup_create(l:channelList, {
+    "         \ 'pos': 'topleft',
+    "         \ 'line': line('.') + 2,
+    "         \ 'col': col('.') + 2,
+    "         \ 'moved': 'any',
+    "         \ })
+    call popup_menu(l:channelList, {
+            \ 'pos' : 'topleft',
+            \ 'line' : line('.') + 2,
+            \ 'col' : col('.') + 2,
+            \ 'moved' : 'any',
+            \ 'filter' : 'popup_filter_menu',
             \ })
   else
     echo "未実装〜"
