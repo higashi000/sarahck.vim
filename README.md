@@ -24,10 +24,9 @@ repo = 'higashi000/sarahck.vim'
 ```
 
 ## How to use
-Slackのトークンを取得し，そのトークンを以下のようにvimscriptファイルに記述後 
-`source $FILEPATH/SlackAPI.vim`等でvimrcに記述して読み込ませてください<br>
-※このトークンを他人に知られてしまうと乗っ取られてしまうので他人に教えないでください
-
+Slackのレガシートークンを取得し，そのトークンを以下のようにvimscriptファイルに記述後，
+`source $FILEPATH/SlackAPI.vim`をvimrcに記述して読み込ませてください<br>
+※このトークンを他人に知られてしまうとアカウントが乗っ取られてしまうので他人に教えないでください
 ```
 let g:slackToken = "Your Token"
 ```
@@ -38,6 +37,13 @@ let g:slackToken = "Your Token"
 ```
 
 スペース等を挟む場合はスペースの前に`\`を記述する必要があります
+
+### チャンネル一覧の表示
+この機能はVim8.1.1594以降でないと使用できません.
+Vim8.1.1594より古いバージョン，Neovimへの対応は検討していますが，ある程度ほかの機能を実装し終えてからになると思います.
+```
+:SarahckChannelList
+```
 
 ### チャンネルのメッセージ確認
 ```
