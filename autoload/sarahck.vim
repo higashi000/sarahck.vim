@@ -18,6 +18,7 @@ sendData = {
     "token" : vim.eval("g:slackToken"),
     "channel" : vim.eval("l:channelID"),
     "text" : vim.eval("l:argumentList[1]"),
+    "as_user" : "true"
 }
 
 slackRes = requests.get("https://slack.com/api/chat.postMessage", params = sendData).json()
