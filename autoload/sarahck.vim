@@ -1,7 +1,7 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-" メッセージ送信
+" メッセージ送信 ---{{{
 function! sarahck#SendMessage(...)
 let l:argumentList = a:000
 
@@ -31,7 +31,9 @@ elseif l:channelID == "0"
     echo "Wrong Channel Name"
 endif
 endfunction
+"}}}
 
+"チャンネルのメッセージを表示---{{{
 function! sarahck#DispChannelHistory(channelName)
 let l:channelID = CheckTrueChannel(a:channelName)
 
@@ -49,7 +51,9 @@ elseif l:channelID == "0"
   echo "Wrong Channel Name"
 endif
 endfunction
+"}}}
 
+" チャンネルのメッセージ取得 ---{{{
 function! GetChannelHistory(channelID)
 
 python3 << PYTHON3
@@ -86,14 +90,22 @@ for channelData in reversed(channelHistory["messages"]) :
     print("-------------------------------------")
     print("")
 PYTHON3
-
 endfunction
+"}}}
 
+" チャンネル一覧の表示--- {{{
+let g:channelsName = []
+let g:channelsID = []
+let g:isFirstReq = 0
 function! sarahck#DispChannelList()
-  let l:channelList = GetChannelList()
+  if !g:isFirstReq
+    call GetChannelList()
+    let g:isFirstReq = 1
+  endif
+
   if has('patch-8.1.1594')
     let pos = getpos('.')
-    call popup_menu(l:channelList, {
+    call popup_menu(g:channelsName, {
             \ 'pos' : 'topleft',
             \ 'line' : line('.') + 2,
             \ 'col' : col('.') + 2,
@@ -104,7 +116,9 @@ function! sarahck#DispChannelList()
     echo "未実装〜"
   endif
 endfunction
+"}}}
 
+" チャンネルリストの取得 {{{
 function! GetChannelList()
 let l:channelList = []
 python3 << PYTHON3
@@ -116,18 +130,20 @@ sendData = {
     "token" : vim.eval('g:slackToken')
 }
 
-slackRes = requests.get('https://slack.com/api/channels.list', params = sendData).json()
+slackRes = requests.get('https://slack.com/api/users.conversations', params = sendData).json()
 if slackRes["ok"] == True :
     for i in slackRes["channels"] :
-        vim.command(":call add(l:channelList, '"+i["name"]+"')")
+        vim.command(":call add(g:channelsName, '"+i["name"]+"')")
+        vim.command(":call add(g:channelsID, '"+i["id"]+"')")
 else :
     print("failed to get channel list")
 PYTHON3
 
 return l:channelList
 endfunction
+" }}}
 
-" チャンネルリスト取得
+" チャンネルが存在するか -- {{{
 function! CheckTrueChannel(channelName)
   let l:channelID = 0
 
@@ -152,6 +168,7 @@ PYTHON3
 
 return l:channelID
 endfunction
+"}}}
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
