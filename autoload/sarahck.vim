@@ -37,25 +37,42 @@ endfunction
 "チャンネルのメッセージを表示---{{{
 function! sarahck#DispChannelHistory(channelName)
 let l:channelID = CheckTrueChannel(a:channelName)
+let l:channelHistory = GetChannelHistory(l:channelID)
 
-let l:fileName = "$HOME/." . a:channelName . ".txt"
-echo l:fileName
+" if has('patch-8.1.1594')
+"   call popup_menu(l:channelHistory, {
+"       \ 'pos' : 'topleft',
+"       \ 'line' : line('.') + 2,
+"       \ 'col' : col('.') + 2,
+"       \ 'moved' : 'any',
+"       \ 'filter' : 'popup_filter_menu',
+"       \ })
+" else
+  let l:fileName = "$HOME/." . a:channelName . ".txt"
+  echo l:fileName
 
-if l:channelID != "0"
-  let outputfile = l:fileName
-  execute ":redir!>".outputfile
-    silent! call GetChannelHistory(l:channelID)
-  redir END
-  execute ":e" . l:fileName
-  execute ":normal G"
-elseif l:channelID == "0"
-  echo "Wrong Channel Name"
-endif
+  if l:channelID != "0"
+    let outputfile = l:fileName
+    execute ":redir!>".outputfile
+      let l:i = len(l:channelHistory) - 1
+      while i >= 0
+          silent echo l:channelHistory[i]
+          let l:i = l:i - 1
+      endwhile
+    redir END
+    execute ":e" . l:fileName
+    execute ":normal G"
+  elseif l:channelID == "0"
+    echo "Wrong Channel Name"
+  endif
+" endif
 endfunction
 "}}}
 
 " チャンネルのメッセージ取得 ---{{{
 function! GetChannelHistory(channelID)
+
+let l:channelMessages = []
 
 python3 << PYTHON3
 import requests
@@ -79,18 +96,19 @@ sendData = {
 }
 users = requests.get("https://slack.com/api/users.list", params = sendData).json()
 
-for channelData in reversed(channelHistory["messages"]) :
+for channelData in channelHistory["messages"] :
     for i in users["members"] :
         if i["id"] == channelData["user"] :
-            if i["profile"]["display_name"] != "" :
-                print(i["profile"]["display_name"] + " " + str((datetime.fromtimestamp(float(channelData["ts"])))))
-            else :
-                print(i["profile"]["real_name"] + " " + str((datetime.fromtimestamp(float(channelData["ts"])))))
-    print(channelData["text"])
-    print("")
-    print("-------------------------------------")
-    print("")
+            messageData = (i['profile']['display_name'] if i['profile']['display_name'] != '' else i['profile']['real_name']) + ' ' + str((datetime.fromtimestamp(float(channelData["ts"]))))
+            messageData += '\n\n'
+            messageData += channelData['text']
+            messageData += '\n'
+            messageData += '-------------------------------------'
+            messageData += '\n'
+            vim.command(":call add(l:channelMessages, '"+messageData+"')")
 PYTHON3
+
+return l:channelMessages
 endfunction
 "}}}
 
@@ -112,10 +130,19 @@ function! sarahck#DispChannelList()
             \ 'col' : col('.') + 2,
             \ 'moved' : 'any',
             \ 'filter' : 'popup_filter_menu',
+            \ 'callback' : function('SelectChannel', [g:channelsName])
             \ })
   else
     echo "未実装〜"
   endif
+endfunction
+
+function! SelectChannel(ctx, id, idx) abort
+  if a:idx ==# -1
+    return
+  endif
+
+  call sarahck#DispChannelHistory(a:ctx[a:idx-1])
 endfunction
 "}}}
 
