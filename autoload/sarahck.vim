@@ -110,24 +110,20 @@ endfunction
 "}}}
 
 " チャンネル一覧の表示--- {{{
-let g:channelsName = []
-let g:channelsID = []
-let g:isFirstReq = 0
 function! sarahck#DispChannelList()
-  if !g:isFirstReq
-    call GetChannelList()
-    let g:isFirstReq = 1
-  endif
+  let l:channelsName = []
+  let l:channelsID = []
+  call GetChannelList(l:channelsName, l:channelsID)
 
   if has('patch-8.1.1594')
     let pos = getpos('.')
-    call popup_menu(g:channelsName, {
+    call popup_menu(l:channelsName, {
             \ 'pos' : 'topleft',
             \ 'line' : line('.') + 2,
             \ 'col' : col('.') + 2,
             \ 'moved' : 'any',
             \ 'filter' : 'popup_filter_menu',
-            \ 'callback' : function('SelectChannel', [g:channelsName])
+            \ 'callback' : function('SelectChannel', [l:channelsName])
             \ })
   else
     echo "未実装〜"
@@ -144,27 +140,18 @@ endfunction
 "}}}
 
 " チャンネルリストの取得 {{{
-function! GetChannelList()
-let l:channelList = []
-python3 << PYTHON3
-import vim
-import requests
-import json
-
-sendData = {
-    "token" : vim.eval('g:slackToken')
-}
-
-slackRes = requests.get('https://slack.com/api/users.conversations', params = sendData).json()
-if slackRes["ok"] == True :
-    for i in slackRes["channels"] :
-        vim.command(":call add(g:channelsName, '"+i["name"]+"')")
-        vim.command(":call add(g:channelsID, '"+i["id"]+"')")
-else :
-    print("failed to get channel list")
-PYTHON3
-
-return l:channelList
+function! GetChannelList(channelsName, channelsID)
+  let url = 'https://slack.com/api/users.conversations'
+  let slackRes = webapi#http#post(url, {'token': g:slackToken})
+  let res = webapi#json#decode(slackRes.content)
+  if res.ok == 1
+    for i in res.channels
+      call add(a:channelsName, i.name)
+      call add(a:channelsID, i.id)
+    endfor
+  else
+    echo 'Failed to get channel list'
+  endif
 endfunction
 " }}}
 
