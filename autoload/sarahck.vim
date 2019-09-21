@@ -6,30 +6,27 @@ function! sarahck#SendMessage(...)
 let l:argumentList = a:000
 
 let l:channelID = CheckTrueChannel(l:argumentList[0])
-let l:postResult = ""
+let l:postResult = ''
 
-if l:channelID != "0"
-python3 << PYTOHN3
-import vim
-import requests
-import json
+if l:channelID != '0'
+  let url = 'https://slack.com/api/chat.postMessage'
+  let sendText = l:argumentList[1]
+  let channel = l:channelID
 
-sendData = {
-    "token" : vim.eval("g:slackToken"),
-    "channel" : vim.eval("l:channelID"),
-    "text" : vim.eval("l:argumentList[1]"),
-    "as_user" : "true"
-}
+  let slackRes = webapi#http#post(url,
+          \ {'token': g:slackToken,
+          \ 'text': sendText,
+          \ 'channel': channel,
+          \ 'as_user': 'true'})
 
-slackRes = requests.get("https://slack.com/api/chat.postMessage", params = sendData).json()
-
-if slackRes["ok"] == True:
-    print("Complete")
-else :
-    print("Failure")
-PYTOHN3
-elseif l:channelID == "0"
-    echo "Wrong Channel Name"
+  let res = webapi#json#decode(slackRes.content)
+  if res.ok == 1
+    echo 'complete'
+  else
+    echo 'failure'
+  endif
+elseif l:channelID == '0'
+    echo 'Wrong Channel Name'
 endif
 endfunction
 "}}}
