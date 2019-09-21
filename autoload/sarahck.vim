@@ -172,24 +172,19 @@ endfunction
 function! CheckTrueChannel(channelName)
   let l:channelID = 0
 
-python3 << PYTHON3
-import vim
-import requests
-import json
+  let url = 'https://slack.com/api/channels.list'
 
-sendData = {
-    "token" : vim.eval('g:slackToken')
-}
-
-slackRes = requests.get('https://slack.com/api/channels.list', params = sendData).json()
-
-if slackRes["ok"] == True :
-    for i in slackRes["channels"] :
-        if i["name"] == vim.eval('a:channelName'):
-            vim.command(":let l:channelID = '"+i["id"]+"'")
-else :
-    print("failed to get channel list")
-PYTHON3
+  let slackRes = webapi#http#post(url, {'token': g:slackToken})
+  let res = webapi#json#decode(slackRes.content)
+  if res.ok == 1
+    for i in res.channels
+      if a:channelName == i.name
+        let l:channelID = i.id
+      endif
+    endfor
+  else
+    echo 'Failed to get channel list'
+  endif
 
 return l:channelID
 endfunction
