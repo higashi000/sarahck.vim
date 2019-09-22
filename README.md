@@ -6,22 +6,14 @@
 ## 動作確認済み環境
 Ubuntu18.04
 
-## Install
-以下のコマンドを実行してpython3が有効化されているかを確認してください．<br>
-されていない場合は有効化を行ってください．
-※今後，Pythonの代わりに[webapi-vim](https://github.com/mattn/webapi-vim)を使用していくので[webapi-vim](https://github.com/mattn/webapi-vim)のインストールも合わせてお願いします(現在実装済みの機能もすべてwebapi-vimに実装し直します)<br>
-```
-:echo has('python3')
-```
-また，内部でpythonのrequestsモジュールを使用しているので以下のコマンドでインストールしてください
-```
-pip3 install requests
-```
+## Library
+このプラグインでは内部で[webapi-vim](https://github.com/mattn/webapi-vim)を使用しています．<br>
+インストールをお願いします．<br>
 
-### dein
+## Install
+deinを使用している際にはvimrcに以下を記述してください
 ```
-[[plugins]]
-repo = 'higashi000/sarahck.vim'
+call dein#add('higashi000/sarahck.vim')
 ```
 
 ## How to use
