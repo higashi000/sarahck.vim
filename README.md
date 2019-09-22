@@ -4,7 +4,8 @@
 このプラグインはVimでSlackをすることを目標に作成されたものです
 
 ## 動作確認済み環境
-Ubuntu18.04
+Ubuntu18.04<br>
+Windows10<br>
 
 ## Library
 このプラグインでは内部で[webapi-vim](https://github.com/mattn/webapi-vim)を使用しています．<br>
