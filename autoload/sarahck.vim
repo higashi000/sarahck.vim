@@ -38,7 +38,6 @@ let l:channelHistory = GetChannelHistory(l:channelID)
 
 " if has('patch-8.1.1594')
 "   call popup_menu(l:channelHistory, {
-"       \ 'pos' : 'topleft',
 "       \ 'line' : line('.') + 2,
 "       \ 'col' : col('.') + 2,
 "       \ 'moved' : 'any',
@@ -51,14 +50,11 @@ let l:channelHistory = GetChannelHistory(l:channelID)
   if l:channelID != "0"
     let outputfile = l:fileName
     execute ":redir!>".outputfile
-      let l:i = len(l:channelHistory) - 1
-      while i >= 0
-          silent echo l:channelHistory[i]
-          let l:i = l:i - 1
-      endwhile
+      for i in l:channelHistory
+          silent echo i
+      endfor
     redir END
     execute ":e" . l:fileName
-    execute ":normal G"
   elseif l:channelID == "0"
     echo "Wrong Channel Name"
   endif
@@ -68,44 +64,36 @@ endfunction
 
 " チャンネルのメッセージ取得 ---{{{
 function! GetChannelHistory(channelID)
+let messageData = []
 
-let l:channelMessages = []
+let url = 'https://slack.com/api/channels.history'
 
-python3 << PYTHON3
-import requests
-import vim
-import json
-import time
-from datetime import datetime
+let slackRes = webapi#http#post(url,
+        \ {'token' : g:slackToken,
+        \ 'channel' : a:channelID})
+let channelHistory = webapi#json#decode(slackRes.content)
 
-sendData = {
-    "token" : vim.eval('g:slackToken'),
-    "channel" : vim.eval('a:channelID'),
-}
+let url = 'https://slack.com/api/users.list'
+let slackRes = webapi#http#post(url, {'token' : g:slackToken})
+let users = webapi#json#decode(slackRes.content)
 
-channelHistory = requests.get("https://slack.com/api/channels.history", params = sendData).json()
+for channelData in channelHistory.messages
+  for user in users.members
+    if user.id == channelData.user
+      if user.profile.display_name == ''
+        let messageData = add(messageData, user.profile.real_name)
+      else
+        let messageData = add(messageData, user.profile.display_name)
+      endif
+      let messageData = add(messageData, '')
+      let messageData = add(messageData, channelData.text)
+      let messageData = add(messageData, '')
+      let messageData = add(messageData, '-----------------------------------')
+    endif
+  endfor
+endfor
 
-time.sleep(1)
-
-
-sendData = {
-    "token" : vim.eval('g:slackToken'),
-}
-users = requests.get("https://slack.com/api/users.list", params = sendData).json()
-
-for channelData in channelHistory["messages"] :
-    for i in users["members"] :
-        if i["id"] == channelData["user"] :
-            messageData = (i['profile']['display_name'] if i['profile']['display_name'] != '' else i['profile']['real_name']) + ' ' + str((datetime.fromtimestamp(float(channelData["ts"]))))
-            messageData += '\n\n'
-            messageData += channelData['text']
-            messageData += '\n'
-            messageData += '-------------------------------------'
-            messageData += '\n'
-            vim.command(":call add(l:channelMessages, '"+messageData+"')")
-PYTHON3
-
-return l:channelMessages
+return messageData
 endfunction
 "}}}
 
@@ -118,7 +106,6 @@ function! sarahck#DispChannelList()
   if has('patch-8.1.1594')
     let pos = getpos('.')
     call popup_menu(l:channelsName, {
-            \ 'pos' : 'topleft',
             \ 'line' : line('.') + 2,
             \ 'col' : col('.') + 2,
             \ 'moved' : 'any',
