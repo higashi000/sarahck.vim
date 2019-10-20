@@ -36,14 +36,13 @@ function! sarahck#DispChannelHistory(channelName)
 let l:channelID = CheckTrueChannel(a:channelName)
 let l:channelHistory = GetChannelHistory(l:channelID)
 
-" if has('patch-8.1.1594')
-"   call popup_menu(l:channelHistory, {
-"       \ 'line' : line('.') + 2,
-"       \ 'col' : col('.') + 2,
-"       \ 'moved' : 'any',
-"       \ 'filter' : 'popup_filter_menu',
-"       \ })
-" else
+if has('patch-8.1.1594')
+  call popup_menu(l:channelHistory, {
+      \ 'maxheight' : 50,
+      \ 'moved' : 'any',
+      \ 'filter' : 'popup_filter_menu',
+      \ })
+else
   let l:fileName = "$HOME/." . a:channelName . ".txt"
   echo l:fileName
 
@@ -58,7 +57,7 @@ let l:channelHistory = GetChannelHistory(l:channelID)
   elseif l:channelID == "0"
     echo "Wrong Channel Name"
   endif
-" endif
+endif
 endfunction
 "}}}
 
