@@ -1,7 +1,7 @@
 # sarahck.vim
 
 ## Description
-This plugin is dose Slack with Vim.<br>
+This plugin is does Slack with Vim.<br>
 
 ## Done operation check
 Ubuntu18.04<br>
