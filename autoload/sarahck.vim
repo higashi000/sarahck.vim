@@ -163,5 +163,21 @@ return l:channelID
 endfunction
 "}}}
 
+" チャンネルの作成 --- {{{
+function! sarahck#ChannelCreate(name)
+  let l:url = 'https://slack.com/api/channels.create'
+  let slackRes = webapi#http#post(url,
+      \ {'token' : g:slackToken,
+      \ 'name': a:name})
+
+  let res = webapi#json#decode(slackRes.content)
+  if res.ok == 1
+    echo 'complete'
+  else
+    echo 'failure'
+  endif
+endfunction
+"  "}}}
+
 let &cpo = s:save_cpo
 unlet s:save_cpo
