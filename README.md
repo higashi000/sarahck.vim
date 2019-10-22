@@ -43,3 +43,8 @@ Sorry, this function can only be used after Vim8.1.1594.
 ```
 :SarahckDispChannel channelName
 ```
+
+### Channel Create
+```
+:SarahckCreateChannel channelName
+```
