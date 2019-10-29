@@ -33,8 +33,9 @@ endfunction
 "}}}
 
 "チャンネルのメッセージを表示---{{{
-function! sarahck#DispChannelHistory(channelName)
-let l:channelID = CheckTrueChannel(a:channelName)
+function! sarahck#DispChannelHistory()
+let l:channelName = input('Channel Name :')
+let l:channelID = CheckTrueChannel(l:channelName)
 let l:channelHistory = GetChannelHistory(l:channelID)
 
 if has('patch-8.1.1594')
