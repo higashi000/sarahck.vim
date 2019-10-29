@@ -30,7 +30,7 @@ If you publish this token, your account may be hijacked.
 
 ### Post
 ```
-:SarahckPostMessage channelName PostText
+:SarahckPostMessage
 ```
 
 ### Display Channel List
@@ -41,7 +41,7 @@ Sorry, this function can only be used after Vim8.1.1594.
 
 ### Display Channel Message
 ```
-:SarahckDispChannel channelName
+:SarahckDispChannel
 ```
 
 ### Channel Create
