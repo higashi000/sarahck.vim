@@ -2,23 +2,24 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 " メッセージ送信 ---{{{
-function! sarahck#SendMessage(...)
-let l:argumentList = a:000
+function! sarahck#SendMessage()
 
-let l:channelID = CheckTrueChannel(l:argumentList[0])
+let l:channelName = input('Post Channel :')
+let l:text = input('Post Message :')
+
+let l:channelID = CheckTrueChannel(l:channelName)
 let l:postResult = ''
 
 if l:channelID != '0'
   let url = 'https://slack.com/api/chat.postMessage'
-  let sendText = l:argumentList[1]
-  let channel = l:channelID
 
   let slackRes = webapi#http#post(url,
           \ {'token': g:slackToken,
-          \ 'text': sendText,
-          \ 'channel': channel,
+          \ 'text': l:text,
+          \ 'channel': l:channelID,
           \ 'as_user': 'true'})
 
+  echo ' '
   let res = webapi#json#decode(slackRes.content)
   if res.ok == 1
     echo 'complete'
