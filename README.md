@@ -30,7 +30,7 @@ If you publish this token, your account may be hijacked.
 
 ### Post
 ```
-:SarahckPostMessage channelName PostText
+:SarahckPostMessage
 ```
 
 ### Display Channel List
