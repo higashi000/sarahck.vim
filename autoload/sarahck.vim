@@ -43,6 +43,21 @@ if has('patch-8.1.1594')
       \ 'moved' : 'any',
       \ 'filter' : 'popup_filter_menu',
       \ })
+elseif has('nvim')
+  let buf = nvim_create_buf(v:false, v:true)
+  call nvim_buf_set_lines(buf, 0, -1, v:true, l:channelHistory)
+  let opts = {'relative': 'cursor',
+            \ 'width': 40,
+            \ 'height': 50,
+            \ 'col': 0,
+            \ 'row': 5,
+            \ 'anchor': 'NW',
+            \ 'style': 'minimal'}
+
+  let win = nvim_open_win(buf, 0, opts)
+
+  call nvim_win_set_option(win, 'winhl', 'Normal:MyHighlight')
+
 else
   let l:fileName = "$HOME/." . a:channelName . ".txt"
   echo l:fileName
