@@ -7,6 +7,7 @@ This plugin is does Slack with Vim.<br>
 Ubuntu18.04<br>
 manjaro<br>
 Windows10<br>
+macOS<br>
 
 ## Library
 This plugin is using [webapi-vim](https://github.com/mattn/webapi-vim).<br>
