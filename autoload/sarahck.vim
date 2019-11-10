@@ -35,7 +35,7 @@ endfunction
 "チャンネルのメッセージを表示---{{{
 function! sarahck#DispChannelHistory(channelName)
 let l:channelID = CheckTrueChannel(a:channelName)
-let l:channelHistory = GetChannelHistory(l:channelID)
+let l:channelHistory = GetChannelHistory(l:channelID, a:channelName)
 
 if has('patch-8.1.1594')
   call popup_menu(l:channelHistory, {
@@ -79,8 +79,8 @@ endfunction
 "}}}
 
 " チャンネルのメッセージ取得 ---{{{
-function! GetChannelHistory(channelID)
-let messageData = []
+function! GetChannelHistory(channelID, channelName)
+let messageData = [a:channelName, '', '-----------------------------------', '']
 
 let url = 'https://slack.com/api/channels.history'
 
@@ -206,15 +206,14 @@ function! sarahck#Choice(ctx, id, idx) abort
 
   let pattern = '\v\d{10,}\v\.\v\d{6,}'
   if match(a:ctx[a:idx-1], pattern) == 0
-    call sarahck#AddReaction(a:ctx[a:idx-1])
+    call sarahck#AddReaction(a:ctx[a:idx-1], a:ctx[0])
   endif
 endfunction
 
-function! sarahck#AddReaction(timeStamp)
-  let l:channelName = input('Channel Name :')
+function! sarahck#AddReaction(timeStamp, channelName)
   let l:name = input('Emoji Name :')
 
-  let l:channelID = CheckTrueChannel(l:channelName)
+  let l:channelID = CheckTrueChannel(a:channelName)
 
   if l:channelID != '0'
     let url = 'https://slack.com/api/reactions.add'
