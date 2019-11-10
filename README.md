@@ -42,10 +42,15 @@ Sorry, this function can only be used after Vim8.1.1594.
 
 ### Display Channel Message
 ```
-:SarahckDispChannel
+:SarahckDispChannel channelName
 ```
 
 ### Channel Create
 ```
 :SarahckCreateChannel channelName
 ```
+
+### Add Reaction
+※Sorry, this function can only be used after Vim8.1.1594.<br>
+Please display channel message on popup window.<br>
+After, you choose timestamp wanting to do add reaction.<br>
