@@ -33,9 +33,8 @@ endfunction
 "}}}
 
 "チャンネルのメッセージを表示---{{{
-function! sarahck#DispChannelHistory()
-let l:channelName = input('Channel Name :')
-let l:channelID = CheckTrueChannel(l:channelName)
+function! sarahck#DispChannelHistory(channelName)
+let l:channelID = CheckTrueChannel(a:channelName)
 let l:channelHistory = GetChannelHistory(l:channelID)
 
 if has('patch-8.1.1594')
@@ -43,6 +42,7 @@ if has('patch-8.1.1594')
       \ 'maxheight' : 50,
       \ 'moved' : 'any',
       \ 'filter' : 'popup_filter_menu',
+      \ 'callback' : function('sarahck#Choice', [l:channelHistory])
       \ })
 elseif has('nvim')
   let buf = nvim_create_buf(v:false, v:true)
@@ -101,6 +101,8 @@ for channelData in channelHistory.messages
       else
         let messageData = add(messageData, user.profile.display_name)
       endif
+      let messageData = add(messageData, '')
+      let messageData = add(messageData, channelData.ts)
       let messageData = add(messageData, '')
       let messageData = add(messageData, channelData.text)
       let messageData = add(messageData, '')
@@ -195,6 +197,45 @@ function! sarahck#ChannelCreate(name)
   endif
 endfunction
 "  "}}}
+
+" リアクション--- {{{
+function! sarahck#Choice(ctx, id, idx) abort
+  if a:idx ==# -1
+    return
+  endif
+
+  let pattern = '\v\d{10,}\v\.\v\d{6,}'
+  if match(a:ctx[a:idx-1], pattern) == 0
+    call sarahck#AddReaction(a:ctx[a:idx-1])
+  endif
+endfunction
+
+function! sarahck#AddReaction(timeStamp)
+  let l:channelName = input('Channel Name :')
+  let l:name = input('Emoji Name :')
+
+  let l:channelID = CheckTrueChannel(l:channelName)
+
+  if l:channelID != '0'
+    let url = 'https://slack.com/api/reactions.add'
+
+    let slackRes = webapi#http#post(url,
+        \ {'token': g:slackToken,
+        \  'channel': l:channelID,
+        \  'name': l:name,
+        \  'timestamp': a:timeStamp})
+    echo ' '
+    let res = webapi#json#decode(slackRes.content)
+    if res.ok == 1
+      echo 'complete'
+    else
+      echo 'failure'
+    endif
+  else
+    echo 'Wrong Channel Name'
+  endif
+endfunction
+" }}}
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
