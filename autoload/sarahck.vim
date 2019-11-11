@@ -80,38 +80,55 @@ endfunction
 
 " チャンネルのメッセージ取得 ---{{{
 function! GetChannelHistory(channelID, channelName)
-let messageData = [a:channelName, '', '-----------------------------------', '']
+  let messageData = [a:channelName, '', '-----------------------------------', '']
 
-let url = 'https://slack.com/api/channels.history'
+  let url = 'https://slack.com/api/channels.history'
 
-let slackRes = webapi#http#post(url,
-        \ {'token' : g:slackToken,
-        \ 'channel' : a:channelID})
-let channelHistory = webapi#json#decode(slackRes.content)
+  let slackRes = webapi#http#post(url,
+          \ {'token' : g:slackToken,
+          \ 'channel' : a:channelID})
+  let channelHistory = webapi#json#decode(slackRes.content)
 
-let url = 'https://slack.com/api/users.list'
-let slackRes = webapi#http#post(url, {'token' : g:slackToken})
-let users = webapi#json#decode(slackRes.content)
+  let url = 'https://slack.com/api/users.list'
+  let slackRes = webapi#http#post(url, {'token' : g:slackToken})
+  let users = webapi#json#decode(slackRes.content)
 
-for channelData in channelHistory.messages
-  for user in users.members
-    if user.id == channelData.user
-      if user.profile.display_name == ''
-        let messageData = add(messageData, user.profile.real_name)
-      else
-        let messageData = add(messageData, user.profile.display_name)
+  for channelData in channelHistory.messages
+    let l:dictKeys = keys(channelData)
+
+    let l:checkEmoji = v:false
+
+    for i in l:dictKeys
+      if i == 'reactions'
+        let l:checkEmoji = v:true
+        break
       endif
-      let messageData = add(messageData, '')
-      let messageData = add(messageData, channelData.ts)
-      let messageData = add(messageData, '')
-      let messageData = add(messageData, channelData.text)
-      let messageData = add(messageData, '')
-      let messageData = add(messageData, '-----------------------------------')
-    endif
-  endfor
-endfor
+    endfor
+    for user in users.members
+      if user.id == channelData.user
+        if user.profile.display_name == ''
+          let messageData = add(messageData, user.profile.real_name)
+        else
+          let messageData = add(messageData, user.profile.display_name)
+        endif
+        let messageData = add(messageData, '')
+        let messageData = add(messageData, channelData.ts)
+        let messageData = add(messageData, '')
+        let messageData = add(messageData, channelData.text)
+        let messageData = add(messageData, '')
 
-return messageData
+        if l:checkEmoji == v:true
+          let messageData = add(messageData, '↓reaction↓')
+          for reaction in channelData.reactions
+            let messageData = add(messageData, ':'.reaction.name.':')
+          endfor
+        endif
+        let messageData = add(messageData, '-----------------------------------')
+      endif
+    endfor
+  endfor
+
+  return messageData
 endfunction
 "}}}
 
