@@ -1,69 +1,79 @@
 let s:save_cpo = &cpo
 set cpo&vim
 
-" メッセージ送信 ---{{{
+" メッセージ送信 {{{
 function! sarahck#SendMessage()
+  let l:channelName = input('Post Channel :')
+  let l:text = input('Post Message :')
 
-let l:channelName = input('Post Channel :')
-let l:text = input('Post Message :')
+  let l:channelID = CheckTrueChannel(l:channelName)
 
-let l:channelID = CheckTrueChannel(l:channelName)
-let l:postResult = ''
+  if l:channelID == '0'
+    echo 'wrong channel name'
+    return
+  endif
 
-if l:channelID != '0'
-  let url = 'https://slack.com/api/chat.postMessage'
+  let s:V = vital#sarahck#new()
+  let s:H = s:V.import('Web.HTTP')
+  let s:J = s:V.import('Web.JSON')
 
-  let slackRes = webapi#http#post(url,
-          \ {'token': g:slackToken,
-          \ 'text': l:text,
-          \ 'channel': l:channelID,
-          \ 'as_user': 'true'})
+  let slackRes = s:H.post('https://slack.com/api/chat.postMessage',
+     \ {'token' : g:slackToken,
+     \ 'channel' : l:channelID,
+     \ 'text': l:text,
+     \ 'as_user' : 'true'})
+  let res = s:J.decode(slackRes.content)
 
   echo ' '
-  let res = webapi#json#decode(slackRes.content)
+
   if res.ok == 1
-    echo 'complete'
+    echo 'comlete'
   else
     echo 'failure'
   endif
-elseif l:channelID == '0'
-    echo 'Wrong Channel Name'
-endif
 endfunction
 "}}}
 
 "チャンネルのメッセージを表示---{{{
 function! sarahck#DispChannelHistory(channelName)
-let l:channelID = CheckTrueChannel(a:channelName)
-let l:channelHistory = GetChannelHistory(l:channelID, a:channelName)
+  let l:channelID = CheckTrueChannel(a:channelName)
+  let l:channelHistory = GetChannelHistory(l:channelID, a:channelName)
 
-if has('patch-8.1.1594')
-  call popup_menu(l:channelHistory, {
-      \ 'maxheight' : 50,
-      \ 'moved' : 'any',
-      \ 'filter' : 'popup_filter_menu',
-      \ 'callback' : function('sarahck#Choice', [l:channelHistory])
-      \ })
-elseif has('nvim')
-  let buf = nvim_create_buf(v:false, v:true)
-  call nvim_buf_set_lines(buf, 0, -1, v:true, l:channelHistory)
-  let opts = {'relative': 'cursor',
-            \ 'width': 40,
-            \ 'height': 50,
-            \ 'col': 0,
-            \ 'row': 5,
-            \ 'anchor': 'NW',
-            \ 'style': 'minimal'}
+  if l:channelHistory[0] == -1
+    echo 'error'
+    return
+  endif
 
-  let win = nvim_open_win(buf, 0, opts)
+  if l:channelID == '0'
+    echo 'Wrong ChannelName'
+    return
+  endif
 
-  call nvim_win_set_option(win, 'winhl', 'Normal:MyHighlight')
+  if has('patch-8.1.1594')
+    call popup_menu(l:channelHistory, {
+        \ 'maxheight' : 50,
+        \ 'moved' : 'any',
+        \ 'filter' : 'popup_filter_menu',
+        \ 'callback' : function('sarahck#Choice', [l:channelHistory])
+        \ })
+  elseif has('nvim')
+    let buf = nvim_create_buf(v:false, v:true)
+    call nvim_buf_set_lines(buf, 0, -1, v:true, l:channelHistory)
+    let opts = {'relative': 'cursor',
+              \ 'width': 40,
+              \ 'height': 50,
+              \ 'col': 0,
+              \ 'row': 5,
+              \ 'anchor': 'NW',
+              \ 'style': 'minimal'}
 
-else
-  let l:fileName = "$HOME/." . a:channelName . ".txt"
-  echo l:fileName
+    let win = nvim_open_win(buf, 0, opts)
 
-  if l:channelID != "0"
+    call nvim_win_set_option(win, 'winhl', 'Normal:MyHighlight')
+  else
+    let l:fileName = "$HOME/." . a:channelName . ".txt"
+    echo l:fileName
+
     let outputfile = l:fileName
     execute ":redir!>".outputfile
       for i in l:channelHistory
@@ -71,10 +81,7 @@ else
       endfor
     redir END
     execute ":e" . l:fileName
-  elseif l:channelID == "0"
-    echo "Wrong Channel Name"
   endif
-endif
 endfunction
 "}}}
 
@@ -82,16 +89,33 @@ endfunction
 function! GetChannelHistory(channelID, channelName)
   let messageData = [a:channelName, '', '-----------------------------------', '']
 
-  let url = 'https://slack.com/api/channels.history'
+  let l:channelID = CheckTrueChannel(a:channelName)
 
-  let slackRes = webapi#http#post(url,
-          \ {'token' : g:slackToken,
-          \ 'channel' : a:channelID})
-  let channelHistory = webapi#json#decode(slackRes.content)
+  if l:channelID == '0'
+    echo 'Wrong channel name'
+    return [-1]
+  endif
 
-  let url = 'https://slack.com/api/users.list'
-  let slackRes = webapi#http#post(url, {'token' : g:slackToken})
-  let users = webapi#json#decode(slackRes.content)
+  let s:V = vital#sarahck#new()
+  let s:H = s:V.import('Web.HTTP')
+  let s:J = s:V.import('Web.JSON')
+
+  let historyAPI = 'https://slack.com/api/channels.history'
+  let slackRes = s:H.get(historyAPI, {'token': g:slackToken, 'channel': l:channelID})
+
+  let channelHistory = s:J.decode(slackRes.content)
+
+  if channelHistory.ok == 0
+    echo 'error'
+    return [-1]
+  endif
+
+  let slackRes = s:H.get('https://slack.com/api/users.list', {'token' : g:slackToken})
+  let users = s:J.decode(slackRes.content)
+  if channelHistory.ok == 0
+    echo 'error'
+    return [-1]
+  endif
 
   for channelData in channelHistory.messages
     let l:dictKeys = keys(channelData)
