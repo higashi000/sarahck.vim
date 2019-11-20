@@ -207,12 +207,17 @@ endfunction
 
 " チャンネルが存在するか -- {{{
 function! CheckTrueChannel(channelName)
+  let s:V = vital#sarahck#new()
+  let s:H = s:V.import('Web.HTTP')
+  let s:J = s:V.import('Web.JSON')
+
   let l:channelID = 0
 
   let url = 'https://slack.com/api/channels.list'
 
-  let slackRes = webapi#http#post(url, {'token': g:slackToken})
-  let res = webapi#json#decode(slackRes.content)
+  let slackRes = s:H.get(url, {'token': g:slackToken})
+  let res = s:J.decode(slackRes.content)
+
   if res.ok == 1
     for i in res.channels
       if a:channelName == i.name
@@ -223,18 +228,24 @@ function! CheckTrueChannel(channelName)
     echo 'Failed to get channel list'
   endif
 
-return l:channelID
+  return l:channelID
 endfunction
 "}}}
 
 " チャンネルの作成 --- {{{
 function! sarahck#ChannelCreate(name)
+  let s:V = vital#sarahck#new()
+  let s:H = s:V.import('Web.HTTP')
+  let s:J = s:V.import('Web.JSON')
+
   let l:url = 'https://slack.com/api/channels.create'
-  let slackRes = webapi#http#post(url,
+
+  let slackRes = s:H.post(url,
       \ {'token' : g:slackToken,
       \ 'name': a:name})
 
-  let res = webapi#json#decode(slackRes.content)
+  let res = s:J.decode(slackRes.content)
+
   if res.ok == 1
     echo 'complete'
   else
@@ -256,6 +267,10 @@ function! sarahck#Choice(ctx, id, idx) abort
 endfunction
 
 function! sarahck#AddReaction(timeStamp, channelName)
+  let s:V = vital#sarahck#new()
+  let s:H = s:V.import('Web.HTTP')
+  let s:J = s:V.import('Web.JSON')
+
   let l:name = input('Emoji Name :')
 
   let l:channelID = CheckTrueChannel(a:channelName)
@@ -263,13 +278,13 @@ function! sarahck#AddReaction(timeStamp, channelName)
   if l:channelID != '0'
     let url = 'https://slack.com/api/reactions.add'
 
-    let slackRes = webapi#http#post(url,
+    let slackRes = s:H.post(url,
         \ {'token': g:slackToken,
         \  'channel': l:channelID,
         \  'name': l:name,
         \  'timestamp': a:timeStamp})
     echo ' '
-    let res = webapi#json#decode(slackRes.content)
+    let res = s:J.decode(slackRes.content)
     if res.ok == 1
       echo 'complete'
     else
