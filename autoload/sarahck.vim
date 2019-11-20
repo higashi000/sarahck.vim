@@ -187,9 +187,13 @@ endfunction
 
 " チャンネルリストの取得 {{{
 function! GetChannelList(channelsName, channelsID)
+  let s:V = vital#sarahck#new()
+  let s:H = s:V.import('Web.HTTP')
+  let s:J = s:V.import('Web.JSON')
+
   let url = 'https://slack.com/api/users.conversations'
-  let slackRes = webapi#http#post(url, {'token': g:slackToken})
-  let res = webapi#json#decode(slackRes.content)
+  let slackRes = s:H.get(url, {'token': g:slackToken})
+  let res = s:J.decode(slackRes.content)
   if res.ok == 1
     for i in res.channels
       call add(a:channelsName, i.name)
