@@ -1,23 +1,24 @@
+[![Powered by vital.vim](https://img.shields.io/badge/powered%20by-vital.vim-80273f.svg)](https://github.com/vim-jp/vital.vim)
+
 # sarahck.vim
 
 ## Description
 This plugin is does Slack with Vim.<br>
 
-## Done operation check
-Ubuntu18.04<br>
-manjaro<br>
-Windows10<br>
-macOS<br>
-
 ## Library
-This plugin is using [webapi-vim](https://github.com/mattn/webapi-vim).<br>
-Please install before this plugin using.<br>
+This plugin is using [vital.vim](https://github.com/vim-jp/vital.vim).<br>
 
 ## Install
 If you using dein.vim.<br>
 Please describe in your vimrc.<br>
 ```
 call dein#add('higashi000/sarahck.vim')
+```
+
+If you using vim-plug.<br>
+Please describe in your vimrc.<br>
+```
+Plug 'higashi000/sarahck.vim'
 ```
 
 ## How to use

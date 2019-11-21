@@ -8,7 +8,7 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 command! SarahckPostMessage call sarahck#SendMessage()
-command! SarahckDispChannel call sarahck#DispChannelHistory()
+command! -nargs=1 SarahckDispChannel call sarahck#DispChannelHistory(<f-args>)
 command! SarahckChannelList call sarahck#DispChannelList()
 command! -nargs=1 SarahckCreateChannel call sarahck#ChannelCreate(<f-args>)
 
