@@ -12,6 +12,7 @@ command! -nargs=1 SarahckDispChannel call sarahckDisplay#channelHistory#DispChan
 command! SarahckChannelList call sarahckDisplay#channelList#DispChannelList()
 command! -nargs=1 SarahckCreateChannel call sarahckSlack#createChannel#ChannelCreate(<f-args>)
 command! SarahckJoinChannel call sarahckSlack#channelJoin#Join()
+command! SarahckLeaveChannel call sarahckSlack#channelLeave#Leave()
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
