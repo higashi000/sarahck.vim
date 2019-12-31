@@ -100,7 +100,14 @@ function! sarahckSlack#dm#history(channel)
     let commandStr = 'date --date "@' . i.ts . '"'
     let messageData = add(messageData, system(commandStr))
     let messageData = add(messageData, '')
-    let messageData = add(messageData, i.text)
+
+    let textStr = i.text
+    let textData = split(textStr, '\n')
+    echo 'a'
+    for i in textData
+      let messageData = add(messageData, i)
+    endfor
+
     let messageData = add(messageData, '')
   endfor
 
