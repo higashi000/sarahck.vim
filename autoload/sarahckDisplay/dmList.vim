@@ -30,10 +30,10 @@ function! sarahckDisplay#dmList#selectDM(ctx, id, key) abort
       let a:ctx.idx = a:ctx.idx - 1
     endif
   elseif a:key ==# "\<cr>"
-    let choice = input('Check DM History / Send Message (c/s) >> ')
+    let choice = input('Check DM History / Send Message (h/s) >> ')
 
-    if choice == 'c'
-      echo 'coming soon...'
+    if choice == 'h'
+      call sarahckDisplay#dmHistory#display(a:ctx.dmID[a:ctx.idx])
     elseif choice == 's'
       call sarahckSlack#dm#sendDM(a:ctx.dmID[a:ctx.idx])
     else
