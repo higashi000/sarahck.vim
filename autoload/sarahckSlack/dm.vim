@@ -98,7 +98,9 @@ function! sarahckSlack#dm#history(channel)
     endif
 
     let commandStr = 'date --date "@' . i.ts . '"'
-    let messageData = add(messageData, system(commandStr))
+    let sendTime = system(commandStr)
+    let parseSendTime = split(sendTime, '\n')
+    let messageData = add(messageData, parseSendTime[0])
     let messageData = add(messageData, '')
 
     let textData = split(i.text, '\n')
