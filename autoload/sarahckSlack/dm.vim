@@ -101,8 +101,7 @@ function! sarahckSlack#dm#history(channel)
     let messageData = add(messageData, system(commandStr))
     let messageData = add(messageData, '')
 
-    let textStr = i.text
-    let textData = split(textStr, '\n')
+    let textData = split(i.text, '\n')
     echo 'a'
     for i in textData
       let messageData = add(messageData, i)
