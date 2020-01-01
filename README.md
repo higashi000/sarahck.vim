@@ -55,3 +55,28 @@ Sorry, this function can only be used after Vim8.1.1594.
 ※Sorry, this function can only be used after Vim8.1.1594.<br>
 Please display channel message on popup window.<br>
 After, you choose timestamp wanting to do add reaction.<br>
+
+### Check Direct Message
+※Sorry, this function can only be used after Vim8.1.1594.<br>
+
+```
+:SarahckDM
+```
+
+### Pictures
+- channel list
+<br>
+![channel list](./img/channelList.png)
+<br>
+- channel History
+<br>
+![channel history](./img/channelHistory.png)
+<br>
+- DM
+<br>
+![DM](./img/dm.png)
+<br>
+- DM list
+<br>
+![DM list](./img/dmList.png)
+<br>
