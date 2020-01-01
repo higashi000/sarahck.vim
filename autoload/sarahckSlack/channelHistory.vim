@@ -52,6 +52,10 @@ function! sarahckSlack#channelHistory#Get(channelID, channelName)
         endif
         let messageData = add(messageData, '')
         let messageData = add(messageData, channelData.ts)
+        let commandStr = 'date --date "@' . channelData.ts . '"'
+        let sendTime = system(commandStr)
+        let parseSendTime = split(sendTime, '\n')
+        let messageData = add(messageData, parseSendTime[0])
         let messageData = add(messageData, '')
         let messageData = add(messageData, channelData.text)
         let messageData = add(messageData, '')
