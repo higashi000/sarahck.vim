@@ -7,16 +7,16 @@ function! sarahckDisplay#dmList#dispDM()
   call sarahckSlack#dm#dmList(dmName, dmID)
 
   let ctx = {
-    \ 'idx': 0,
-    \ 'dmName': dmName,
-    \ 'dmID': dmID
-    \ }
+        \ 'idx': 0,
+        \ 'dmName': dmName,
+        \ 'dmID': dmID
+        \ }
 
   if has('patch-8.1.1594')
     call popup_menu(dmName, {
-        \ 'maxheight' : 50,
-        \ 'filter' : function('sarahckDisplay#dmList#selectDM', [ctx])
-        \ })
+          \ 'maxheight': 50,
+          \ 'filter': function('sarahckDisplay#dmList#selectDM', [ctx])
+          \ })
   endif
 endfunction
 
@@ -39,6 +39,10 @@ function! sarahckDisplay#dmList#selectDM(ctx, id, key) abort
     else
       echo 'Please correct choice.'
     endif
+  elseif a:key ==# "h"
+    call sarahckDisplay#dmHistory#display(a:ctx.dmID[a:ctx.idx])
+  elseif a:key ==# "s"
+    call sarahckSlack#dm#sendDM(a:ctx.dmID[a:ctx.idx])
   endif
 
   return popup_filter_menu(a:id, a:key)
