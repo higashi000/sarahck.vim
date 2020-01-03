@@ -5,11 +5,10 @@ function! sarahckDisplay#dmHistory#display(channel)
   let messageData = sarahckSlack#dm#history(a:channel)
 
   if has('patch-8.1.1594')
-    call popup_menu(messageData, {
+    call popup_menu(messageData.data, {
         \ 'maxheight': 50,
         \ 'moved': 'any',
         \ 'filter': 'popup_filter_menu',
-        \ 'callback': function('sarahckSlack#addReaction#Choice', [messageData])
         \ })
   endif
 endfunction
