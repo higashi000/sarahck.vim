@@ -75,7 +75,7 @@ function! sarahckSlack#dm#history(channel)
     return -1
   endif
 
-  let messageData = {'data': [''], 'timestamp': ['']}
+  let messageData = {'data': [''], 'timestamp': [''], 'id': a:channel}
 
   let user1 = {'id': '', 'name': ''}
   let user2 = {'id': '', 'name': ''}

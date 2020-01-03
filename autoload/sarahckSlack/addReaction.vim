@@ -12,6 +12,29 @@ function! sarahckSlack#addReaction#Choice(ctx, id, idx) abort
   endif
 endfunction
 
+function! sarahckSlack#addReaction#dmReaction(timeStamp, id)
+  let s:V = vital#sarahck#new()
+  let s:H = s:V.import('Web.HTTP')
+  let s:J = s:V.import('Web.JSON')
+
+  let l:name = input('Emoji Name :')
+  let url = 'https://slack.com/api/reactions.add'
+
+  let slackRes = s:H.post(url,
+        \ {'token': g:slackToken,
+        \  'channel': a:id,
+        \  'name': l:name,
+        \  'timestamp': a:timeStamp})
+  echo ' '
+  let res = s:J.decode(slackRes.content)
+  if res.ok == 1
+    echo 'complete'
+  else
+    echo 'failure'
+  endif
+endfunction
+
+
 function! sarahckSlack#addReaction#AddReaction(timeStamp, channelName)
   let s:V = vital#sarahck#new()
   let s:H = s:V.import('Web.HTTP')
@@ -25,10 +48,10 @@ function! sarahckSlack#addReaction#AddReaction(timeStamp, channelName)
     let url = 'https://slack.com/api/reactions.add'
 
     let slackRes = s:H.post(url,
-        \ {'token': g:slackToken,
-        \  'channel': l:channelID,
-        \  'name': l:name,
-        \  'timestamp': a:timeStamp})
+          \ {'token': g:slackToken,
+          \  'channel': l:channelID,
+          \  'name': l:name,
+          \  'timestamp': a:timeStamp})
     echo ' '
     let res = s:J.decode(slackRes.content)
     if res.ok == 1
