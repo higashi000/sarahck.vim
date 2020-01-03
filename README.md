@@ -66,17 +66,17 @@ After, you choose timestamp wanting to do add reaction.<br>
 ### Pictures
 - channel list
 <br>
-![channel list](./img/channelList.png)
+![channel list](./img/channellist.png)
 <br>
-- channel History
+- DM List
 <br>
-![channel history](./img/channelHistory.png)
+![DM](./img/dmlist.png)
 <br>
-- DM
+- choice check history or send message
 <br>
-![DM](./img/dm.png)
+![choice](./img/dmchoice.png)
 <br>
-- DM list
+- DM History and Channel History
 <br>
-![DM list](./img/dmList.png)
+![DM list](./img/dmhistory.png)
 <br>
