@@ -5,7 +5,7 @@ function! sarahckDisplay#channelHistory#DispChannelHistory(channelName)
   let l:channelID = sarahckSlack#channelExists#CheckTrueChannel(a:channelName)
   let l:channelHistory = sarahckSlack#channelHistory#Get(l:channelID, a:channelName)
 
-  if l:channelHistory[0] == -1
+  if l:channelHistory.status == 'false'
     echo 'error'
     return
   endif
@@ -15,12 +15,17 @@ function! sarahckDisplay#channelHistory#DispChannelHistory(channelName)
     return
   endif
 
+  let ctx = {
+        \ 'idx': 0,
+        \ 'timestamp': l:channelHistory.timestamp,
+        \ 'id': l:channelID,
+        \ }
+
   if has('patch-8.1.1594')
-    call popup_menu(l:channelHistory, {
+    call popup_menu(l:channelHistory.data, {
         \ 'maxheight' : 50,
         \ 'moved' : 'any',
-        \ 'filter' : 'popup_filter_menu',
-        \ 'callback' : function('sarahckSlack#addReaction#Choice', [l:channelHistory])
+        \ 'filter': function('sarahckDisplay#dmHistory#selectReaction', [ctx])
         \ })
   elseif has('nvim')
     let buf = nvim_create_buf(v:false, v:true)
