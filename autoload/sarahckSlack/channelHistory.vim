@@ -2,13 +2,22 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 function! sarahckSlack#channelHistory#Get(channelID, channelName)
-  let messageData = [a:channelName, '', '-----------------------------------', '']
+  let messageData = {'data': [''], 'timestamp': [''], 'status': 'true'}
+  let messageData.data = add(messageData.data, a:channelName)
+  let messageData.timestamp = add(messageData.timestamp, '')
+  let messageData.data = add(messageData.data, '')
+  let messageData.timestamp = add(messageData.timestamp, '')
+  let messageData.data = add(messageData.data, '-----------------------------------')
+  let messageData.timestamp = add(messageData.timestamp, '')
+  let messageData.data = add(messageData.data, '')
+  let messageData.timestamp = add(messageData.timestamp, '')
 
   let l:channelID = sarahckSlack#channelExists#CheckTrueChannel(a:channelName)
 
   if l:channelID == '0'
     echo 'Wrong channel name'
-    return [-1]
+    let messageData.status = 'false'
+    return messageData
   endif
 
   let s:V = vital#sarahck#new()
@@ -46,32 +55,41 @@ function! sarahckSlack#channelHistory#Get(channelID, channelName)
     for user in users.members
       if user.id == channelData.user
         if user.profile.display_name == ''
-          let messageData = add(messageData, user.profile.real_name)
+          let messageData.data = add(messageData.data, user.profile.real_name)
+          let messageData.timestamp = add(messageData.timestamp, channelData.ts)
         else
-          let messageData = add(messageData, user.profile.display_name)
+          let messageData.data = add(messageData.data, user.profile.display_name)
+          let messageData.timestamp = add(messageData.timestamp, channelData.ts)
         endif
-        let messageData = add(messageData, '')
-        let messageData = add(messageData, channelData.ts)
+        let messageData.data = add(messageData.data, '')
+        let messageData.timestamp = add(messageData.timestamp, channelData.ts)
         let commandStr = 'date --date "@' . channelData.ts . '"'
         let sendTime = system(commandStr)
         let parseSendTime = split(sendTime, '\n')
-        let messageData = add(messageData, parseSendTime[0])
-        let messageData = add(messageData, '')
+        let messageData.data = add(messageData.data, parseSendTime[0])
+        let messageData.timestamp = add(messageData.timestamp, channelData.ts)
+        let messageData.data = add(messageData.data, '')
+        let messageData.timestamp = add(messageData.timestamp, channelData.ts)
 
         let textData = split(channelData.text, '\n')
         for i in textData
-          let messageData = add(messageData, i)
+          let messageData.data = add(messageData.data, i)
+          let messageData.timestamp = add(messageData.timestamp, channelData.ts)
         endfor
 
-        let messageData = add(messageData, '')
+        let messageData.data = add(messageData.data, '')
+        let messageData.timestamp = add(messageData.timestamp, channelData.ts)
 
         if l:checkEmoji == v:true
-          let messageData = add(messageData, '↓reaction↓')
+          let messageData.data = add(messageData.data, '↓reaction↓')
+          let messageData.timestamp = add(messageData.timestamp, channelData.ts)
           for reaction in channelData.reactions
-            let messageData = add(messageData, ':'.reaction.name.':')
+            let messageData.data = add(messageData.data, ':'.reaction.name.':')
+            let messageData.timestamp = add(messageData.timestamp, channelData.ts)
           endfor
         endif
-        let messageData = add(messageData, '-----------------------------------')
+        let messageData.data = add(messageData.data, '-----------------------------------')
+        let messageData.timestamp = add(messageData.timestamp, '')
       endif
     endfor
   endfor
